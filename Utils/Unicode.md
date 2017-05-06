@@ -1,7 +1,11 @@
+# 关于Android一些字符串转码的处理
+## 1，转码成Unicode以及解析
+## 2，转码成UTF-8以及解析
 ``` java
 /**
  * description:
- *
+ * 1，转码成Unicode以及解析
+ * 2，转码成UTF-8以及解析
  * @auther cuihai
  * @since 2017/5/3.
  */
