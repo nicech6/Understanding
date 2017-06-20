@@ -5,7 +5,7 @@
  * @since 2017/5/31.
  */
 
-> public class PopUpAndDownView {
+public class PopUpAndDownView {
     private PopupWindow popupWindow;
     private Window mWindow;
     private Context context;
