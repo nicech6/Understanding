@@ -1,0 +1,28 @@
+/**
+     * @param main       根布局
+     * @param scrollView 需要显示的最下方的View
+     */
+    private void addLayoutListener(final View main, final View scrollView) {
+        main.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                Rect rect = new Rect();
+                // 1，获取main 在窗体中可视的区域
+                main.getWindowVisibleDisplayFrame(rect);
+                // 2, 获取main 在窗体不可见区域，在键盘没有弹起时
+                int mainHeight = main.getRootView().getHeight() - rect.bottom;
+                if (mainHeight > 100) {
+                    // 3,不可见区域大于100说明键盘弹起了
+                    int[] location = new int[2];
+                    scrollView.getLocationInWindow(location);
+                    // 4,获取Scroll窗体坐标，算出main需要滚动的高度
+                    int scrollHeight = location[1] + scrollView.getHeight() - rect.bottom;
+                    // 5,让整体上移键盘的高度
+                    main.scrollTo(0, scrollHeight);
+                } else {
+                    // 6,不可见区域小于100说明键盘隐藏了，恢复原来的高度
+                    main.scrollTo(0, 0);
+                }
+            }
+        });
+    }
