@@ -1,6 +1,4 @@
 # Understanding
-  ---
   
 ## 第一部分：
-1,平时会分享一些自己对源码的理解
-2,日常工作中总结的很实用的工具类
+ * [Android内存泄漏总结](https://github.com/icuihai/understanding/blob/master/Android%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F.md)
