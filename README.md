@@ -19,5 +19,5 @@
 微博账号：
 [崔海的微博](https://weibo.com/icuihai)
 
-有任何问题欢迎联系：
+与我联系：
 icuihai@gmail.com
