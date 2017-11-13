@@ -13,11 +13,11 @@
  
  ---
 
-有任何问题欢迎联系：
-icuihai@gmail.com
-
 个人博客：
 [icuihai.com](http://icuihai.com/)
 
 微博账号：
 [崔海的微博](https://weibo.com/icuihai)
+
+有任何问题欢迎联系：
+icuihai@gmail.com
