@@ -8,6 +8,7 @@
  
  ## 第二部分：
  * [键盘挡住输入框解决办法](https://github.com/icuihai/understanding/blob/master/%E9%94%AE%E7%9B%98%E6%8C%A1%E4%BD%8F%E8%BE%93%E5%85%A5%E6%A1%86%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95)
+ * [Emoji字符串转码处理](https://github.com/icuihai/Understanding/blob/master/Utils/Unicode.md)
  * [360渠道打包统计流程](https://github.com/icuihai/understanding/blob/master/360%E6%B8%A0%E9%81%93%E6%89%93%E5%8C%85%E6%B5%81%E7%A8%8B)
  * [Kotlin语法糖](https://github.com/icuihai/understanding/blob/master/Kotlin/Kotlin.md)
  
