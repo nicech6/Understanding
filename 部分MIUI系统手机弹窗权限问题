@@ -1,6 +1,15 @@
-### 
+ 
+
 最近在工作中有用户反映一个问题，具体就是小米手机弹窗无权限，所以导致App直接崩溃，查了下资料记录一下：
-> 具体报错为：
+
+具体报错为：
+
 Unable to add window -- window android.view.ViewRootImpl$W@4a51004 has already been added
+
 android.view.ViewRootImpl.setView(ViewRootImpl.java:695)
+
+然后在bugly上给出的解决方案有一条是：
+
+    某些不稳定的MIUI系统bug引起的权限问题，系统把Toast也当成了系统级弹窗，android6.0的系统Dialog弹窗需要用户手动授权，若果app没有加入SYSTEM_ALERT_WINDOW权限就会报这个错。需要加入给app加系统Dialog弹窗权限，并动态申请权限，不满足第一条会出现没权限闪退，不满足第二条会出现没有Toast的情况。
+
 
