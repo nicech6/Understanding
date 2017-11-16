@@ -10,6 +10,18 @@ android.view.ViewRootImpl.setView(ViewRootImpl.java:695)
 
 然后在bugly上给出的解决方案有一条是：
 
-    某些不稳定的MIUI系统bug引起的权限问题，系统把Toast也当成了系统级弹窗，android6.0的系统Dialog弹窗需要用户手动授权，若果app没有加入SYSTEM_ALERT_WINDOW权限就会报这个错。需要加入给app加系统Dialog弹窗权限，并动态申请权限，不满足第一条会出现没权限闪退，不满足第二条会出现没有Toast的情况。
+    某些不稳定的MIUI系统bug引起的权限问题，系统把Toast也当成了系统级弹窗，android6.0的系统Dialog弹窗需要用户手动授权，
+    若果app没有加入SYSTEM_ALERT_WINDOW权限就会报这个错。需要加入给app加系统Dialog弹窗权限，并动态申请权限，
+    不满足第一条会出现没权限闪退，不满足第二条会出现没有Toast的情况。
+最终解决方案为：
+1,首先在清单文件中申请权限SYSTEM_ALERT_WINDOW
+2,动态申请权限：
+            Class clazz = Settings.class;
+            Field field = clazz.getDeclaredField("ACTION_MANAGE_OVERLAY_PERMISSION");
+            Intent intent = new Intent(field.get(null).toString());
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setData(Uri.parse("package:" + context.getPackageName()));
+            context.startActivity(intent);
+  上面是引导用户用户开启悬浮窗，开启之后则问题解决
 
 
