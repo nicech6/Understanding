@@ -1,0 +1,117 @@
+
+概述
+
+Toast作为Android应用中最常见的一种提示方式，由于简单的api设计和简洁的交互体验被我们广泛使用，但是这并代表他很完美，本文将记录我在开发中遇到的问题。
+
+背景
+
+最近项目好多用户反应有bug，然后看log出现了一个奇怪的问题，而且次数不很多，如下：
+
+    #1664 android.view.WindowManager$BadTokenException
+    Unable to add window -- window android.view.ViewRootImpl$W@4a51004 has already been added
+    android.view.ViewRootImpl.setView(ViewRootImpl.java:695)
+    android.view.ViewRootImpl.setView(ViewRootImpl.java:691)
+    android.view.WindowManagerGlobal.addView(WindowManagerGlobal.java:342)
+    android.view.WindowManagerImpl.addView(WindowManagerImpl.java:94)
+    android.widget.Toast$TN.handleShow(Toast.java:506)
+    android.widget.Toast$TN$2.handleMessage(Toast.java:389)
+    android.os.Handler.dispatchMessage(Handler.java:102)
+    android.os.Looper.loop(Looper.java:154) android.app.ActivityThread.main(ActivityThread.java:6292) java.lang.reflect.Method.invoke(Native Method)
+    com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:906)
+    com.android.internal.os.ZygoteInit.main(ZygoteInit.java:796)
+
+然后发现居然都是7.1.1设备才出现的，见下图：
+
+
+
+Toast显示与隐藏
+
+首先Toast显示依赖于一个窗口，这个窗口被WMS管理（WindowManagerService），当需要show的时候这个请求会放在WMS请求队列中，并且会传递一个TN类型的Bider对象给WMS，WMS并生成一个token传递给Android进行显示与隐藏，但是如果UI线程的某个线程发生了阻塞，并且已经NotificationManager检测已经超时就不删除token记录，此时token已经过期，阻塞结束的时候再显示的时候就发生了异常。
+
+在android7.1.1的Toast源码handleShow是这样写的:
+
+    mWM.addView(mView, mParams);
+
+而在8.0则是这样的:
+
+     try {
+                        mWM.addView(mView, mParams);
+                        trySendAccessibilityEvent();
+                    } catch (WindowManager.BadTokenException e) {
+                        /* ignore */
+                    }
+
+到这里能看到在发生异常的时候使用了try catch捕获，程序不会挂掉
+
+解决方案
+
+    /**
+     * @author CH
+     * @date 2018/6/26
+     * 部分7.1.1手机崩溃Toast解决方案
+     */
+    public class ToastCompat {
+        private static Field sField_TN;
+        private static Field sField_TN_Handler;
+        private Toast mToast;
+    
+        static {
+            try {
+                sField_TN = Toast.class.getDeclaredField("mTN");
+                sField_TN.setAccessible(true);
+                sField_TN_Handler = sField_TN.getType().getDeclaredField("mHandler");
+                sField_TN_Handler.setAccessible(true);
+            } catch (Exception e) {
+            }
+        }
+    
+        private static void hook(Toast toast) {
+            try {
+                Object tn = sField_TN.get(toast);
+                Handler preHandler = (Handler) sField_TN_Handler.get(tn);
+                sField_TN_Handler.set(tn, new SafelyHandlerWarpper(preHandler));
+            } catch (Exception e) {
+            }
+        }
+    
+        public void showToast(Context context, CharSequence cs, int length) {
+            if (mToast == null) {
+                mToast = Toast.makeText(context, cs, length);
+            } else {
+                mToast.setText(cs);
+            }
+            hook(mToast);
+            mToast.show();
+        }
+    
+        public static class SafelyHandlerWarpper extends Handler {
+            private Handler impl;
+    
+            public SafelyHandlerWarpper(Handler impl) {
+                this.impl = impl;
+            }
+    
+            @Override
+            public void dispatchMessage(Message msg) {
+                try {
+                    super.dispatchMessage(msg);
+                } catch (Exception e) {
+                }
+            }
+    
+            @Override
+            public void handleMessage(Message msg) {
+                impl.handleMessage(msg);//需要委托给原Handler执行
+            }
+        }
+    }
+
+简单来说就是通过反射注入在发生异常的地方进行try catch
+
+声明：此解决方案来源于QQ音乐团队
+
+http://www.itboth.com/d/jiY73qyeAzei/api-java-toast-android
+
+
+
+
